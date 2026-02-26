@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Lean project
+        uses: leanprover/lean-action@v1
+        with:
+          test: |
+            lake update
+            lake build

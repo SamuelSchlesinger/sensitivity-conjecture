@@ -15,26 +15,36 @@ with our definitions.
 
 namespace Sensitivity
 
--- Make Q transparent so elaborator unifies Q m.succ with Fin (m+1) → Bool
-set_option allowUnsafeReducibility true in
-attribute [local reducible] Q in
 /-- Mathlib's Huang theorem restated with Finsets. -/
 theorem huang_finset {m : ℕ} (H : Finset (Fin (m + 1) → Bool))
     (hH : 2 ^ m + 1 ≤ H.card) :
     ∃ q ∈ H, Real.sqrt (↑m + 1) ≤
       ↑(H.filter (fun p => ∃ i, p = flipBit q i)).card := by
-  -- Apply Mathlib's huang_degree_theorem; convert handles Fintype instance diamond
-  obtain ⟨q, hqH, hbound⟩ := huang_degree_theorem (↑H : Set (Q m.succ)) (by
-    suffices H.card ≥ 2 ^ m + 1 by
-      convert this using 1
-      congr 1; ext x; simp
-    omega)
-  refine ⟨q, Finset.mem_coe.mp hqH, le_trans hbound ?_⟩
+  classical
+  -- `Archive.Sensitivity` states Huang's theorem over `Set (Q m.succ)`.
+  -- We bridge from our `Finset (Fin (m+1) → Bool)` without changing reducibility attributes.
+  let HQ : Set (Q m.succ) := {x | (show Fin (m + 1) → Bool from x) ∈ H}
+  letI : DecidablePred (fun a : Q m.succ => a ∈ HQ) := Classical.decPred _
+  let eEmb : Q m.succ ↪ (Fin (m + 1) → Bool) :=
+    ⟨fun x => (show Fin (m + 1) → Bool from x), fun _ _ h => h⟩
+  have hmap : HQ.toFinset.map eEmb = H := by
+    ext x
+    simp [HQ, eEmb]
+  have hHQcard : HQ.toFinset.card = H.card := by
+    calc
+      HQ.toFinset.card = (HQ.toFinset.map eEmb).card := by simp
+      _ = H.card := by rw [hmap]
+  have hHQ : HQ.toFinset.card ≥ 2 ^ m + 1 := by
+    omega
+  obtain ⟨q, hqH, hbound⟩ := huang_degree_theorem HQ hHQ
+  have hqH' : (show Fin (m + 1) → Bool from q) ∈ H := by
+    simpa [HQ] using hqH
+  refine ⟨(show Fin (m + 1) → Bool from q), hqH', le_trans hbound ?_⟩
   -- Show Card(↑H ∩ q.adjacent) ≤ ↑(H.filter ...).card
   push_cast [Nat.cast_le]
   apply Finset.card_le_card
   intro p hp
-  simp only [Set.mem_toFinset, Set.mem_inter_iff, Finset.mem_coe] at hp
+  simp only [Set.mem_toFinset, Set.mem_inter_iff] at hp
   rw [Finset.mem_filter]
   refine ⟨hp.1, ?_⟩
   -- hp.2 : p ∈ Q.adjacent q, i.e., ∃! i, q i ≠ p i
