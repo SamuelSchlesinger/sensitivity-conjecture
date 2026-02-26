@@ -2,16 +2,24 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
       - uses: actions/checkout@v4
-      - name: Build Lean project
-        uses: leanprover/lean-action@v1
         with:
-          test: |
-            lake update
-            lake build
+          fetch-depth: 0
+      - uses: leanprover/lean-action@v1
+      - if: github.event_name != 'pull_request'
+        uses: leanprover-community/docgen-action@v1
