@@ -48,7 +48,18 @@ lake update
 lake build
 ```
 
+## Acknowledgments
+
+This formalization was inspired by the
+[lean-sensitivity](https://github.com/leanprover-community/lean-sensitivity)
+project by the Lean community, which formalized Huang's proof of the
+Sensitivity Conjecture shortly after its announcement in 2019. That
+formalization was later incorporated into Mathlib as `Archive.Sensitivity`,
+which we use here as the foundation for bridging to Huang's hypercube
+eigenvalue argument.
+
 ## References
 
 - Hao Huang, *Induced subgraphs of hypercubes and a proof of the Sensitivity Conjecture*, Annals of Mathematics 190(3), 949-955, 2019.
 - Noam Nisan and Mario Szegedy, *On the degree of Boolean functions as real polynomials*, Computational Complexity 4, 301-313, 1994.
+- Lean community, [lean-sensitivity](https://github.com/leanprover-community/lean-sensitivity), 2019. Formalization of Huang's proof in Lean, now part of Mathlib.

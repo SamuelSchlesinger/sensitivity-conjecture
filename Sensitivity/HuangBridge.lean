@@ -11,6 +11,12 @@ import Mathlib.Data.Fintype.Pi
 
 Repackages Mathlib's `Sensitivity.huang_degree_theorem` in terms compatible
 with our definitions.
+
+The Mathlib formalization in `Archive.Sensitivity` originates from the
+[lean-sensitivity](https://github.com/leanprover-community/lean-sensitivity)
+project, a rapid community formalization of Huang's proof carried out shortly
+after the paper appeared in 2019. That effort was a key inspiration for this
+project.
 -/
 
 namespace Sensitivity
